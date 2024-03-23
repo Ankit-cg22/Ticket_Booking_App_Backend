@@ -16,7 +16,8 @@ const getTicketInfo = async (req, res) => {
         //ticketId exists
         return res.status(200).json({success:true , data : {ticketData: data.data.ticketData} })
     })
-    .catch(()=>{
+    .catch((err)=>{
+        console.log(err)
         return res.status(500).json({success:false , msg:"Internal server error"})
 
     })
@@ -37,6 +38,7 @@ const bookTicket = async (req, res) => {
         return res.status(200).json({success:true , msg:"Ticket booked successfully." , data : {ticketData : data.data.ticketData}})
     })
     .catch((err)=>{
+        console.log(err)
         return res.status(500).json({success:false , msg:"Internal server error."})
     })
     
@@ -55,6 +57,7 @@ const markCheckedIn = async (req , res) =>{
         res.status(200).json({success:true , msg:`Ticket with ticketId=${ticketId} has been marked as 'Checked In' .` , data:{ticketData:data.data.ticketData}})
     }
     catch(err){
+        console.log(err)
         res.status(500).json({success:false , msg:"Internal server error"})
     }
 
