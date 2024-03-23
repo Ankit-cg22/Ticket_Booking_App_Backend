@@ -2,9 +2,9 @@ const { haromia_db_insert, harmonia_db_search } = require("./Harmonia_DB_Operati
 const { RSA_encrypt, RSA_decrypt } = require("./RSA")
 const { ObjtoString, StringToObj } = require("./parsing")
 
-function insert_into_db(ticketId , data){
+function insert_into_db(ticketId , ticketData){
     return new Promise((resolve , reject)=>{
-        const str = ObjtoString(data)
+        const str = ObjtoString(ticketData)
 
         const encryptedData = RSA_encrypt(str)
 
@@ -15,7 +15,7 @@ function insert_into_db(ticketId , data){
 
         haromia_db_insert(db_server_data)
         .then((data)=>{
-            resolve(data)
+            resolve({succes: true , data:{ ticketData  , timeTakenInMicroSeconds : data.data.timeTakenInMicroSeconds }})
         })
         .catch((err)=>{
             reject(err)
