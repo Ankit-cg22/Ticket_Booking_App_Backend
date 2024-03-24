@@ -48,7 +48,7 @@ const loginUser = async(req , res) => {
         const comparisonResult = await bcrypt.compare(req.body.password , storedUser.password)
 
         if(comparisonResult === true){
-            const verifiedUser = {userId : storedUser._id , name:storedUser.name , email:storedUser.email , isAdmin:storedUser.isAdmin , isVerfied : storedUser.isVerified}
+            const verifiedUser = {userId : storedUser._id , name:storedUser.name , email:storedUser.email , isAdmin:storedUser.isAdmin , isVerified : storedUser.isVerified}
 
             // sign the JWT
             const jwtToken = jwt.sign(verifiedUser , process.env.JWT_ACCESS_TOKEN_SECRET)
