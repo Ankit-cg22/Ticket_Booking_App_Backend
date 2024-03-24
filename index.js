@@ -8,9 +8,11 @@ app.use(cors())
 app.use(bodyParser.json());
 dotenv.config()
 
-const ticketsRouters = require('./routes/tickets.js')
+const ticketsRoutes = require('./routes/tickets.js')
+const authRoutes = require('./routes/auth.js')
 
-app.use('/tickets' , ticketsRouters)
+app.use('/tickets' , ticketsRoutes)
+app.use('/auth' , authRoutes)
 
 app.get('/' , (req , res)=>{
     res.json({status : "Success" , msg : "Welcome to ticket booking app server"})
