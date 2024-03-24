@@ -5,4 +5,10 @@ function getNextTicketId(){
     return ticketId;
 }
 
-module.exports = {getNextTicketId}
+const generateOTP = () => {
+    const OTP = `${Math.floor(1000 + Math.random()*9000)}`
+    return OTP;
+}
+
+
+module.exports = {getNextTicketId , generateOTP}
