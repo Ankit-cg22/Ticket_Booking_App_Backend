@@ -1,8 +1,14 @@
 let ticketId = 1010;
+let eventId = 2020;
 
 function getNextTicketId(){
     ++ticketId;
     return ticketId;
+}
+
+function getNextEventId(){
+    ++eventId;
+    return eventId ;
 }
 
 const generateOTP = () => {
@@ -11,4 +17,4 @@ const generateOTP = () => {
 }
 
 
-module.exports = {getNextTicketId , generateOTP}
+module.exports = {getNextTicketId , generateOTP , getNextEventId}

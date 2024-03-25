@@ -71,17 +71,6 @@ const testController = (req ,res) =>{
     res.status(200).json({verifiedUser})
 }
 
-const authenticateJWTToken = (req, res , next) => {
-    const jwtToken = req.body.jwtToken
-    if(jwtToken == null) return res.status(401).json({success:false , msg:"No JWT token found in the requst ."})
-    
-    jwt.verify(jwtToken , process.env.JWT_ACCESS_TOKEN_SECRET , (err, user)=>{
-        if(err) return res.status(403).json({success:false , msg:"Invalid JWT token ."})
-        req.verifiedUser = user;
-        next()
-    })
-}
-
 const verifyOTP = async (req ,res)=>{
     try{
         const userId = req.body.userId
@@ -131,4 +120,4 @@ const verifyOTP = async (req ,res)=>{
 }
 
 
-module.exports = {registerUser , loginUser , authenticateJWTToken , testController , verifyOTP}
+module.exports = {registerUser , loginUser , testController , verifyOTP}

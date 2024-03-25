@@ -11,9 +11,11 @@ dotenv.config()
 
 const ticketsRoutes = require('./routes/tickets.js')
 const authRoutes = require('./routes/auth.js')
+const eventsRoutes = require('./routes/events.js')
 
 app.use('/tickets' , ticketsRoutes)
 app.use('/auth' , authRoutes)
+app.use('/events' , eventsRoutes)
 
 app.get('/' , (req , res)=>{
     res.json({status : "Success" , msg : "Welcome to ticket booking app server"})
