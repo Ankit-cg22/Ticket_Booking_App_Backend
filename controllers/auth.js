@@ -2,8 +2,9 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 require('dotenv').config()
 const UserCollection = require('../models/User.js')
-const { sendOTPVerificationEmail } = require('../utils/mailing_service.js')
+const { sendOTPVerificationEmail, sendAdminRequestEmail } = require('../utils/mailing_service.js')
 const UserOTPVerificationCollection = require('../models/UserOTPVerification.js')
+const { verifyJWTToken } = require('../utils/utilityFunctions.js')
 
 const registerUser = async (req , res)=>{
     const userData = req.body 
@@ -119,5 +120,65 @@ const verifyOTP = async (req ,res)=>{
     }
 }
 
+const sendAdminRequestMail = async(req , res) => {
+    try{
+        const {email} = req.body.userData
+        
+        const storedUser = await UserCollection.findOne({email})
 
-module.exports = {registerUser , loginUser , testController , verifyOTP}
+        if(storedUser === null) return res.status(404).json({success:false , msg : `Email id ${email} is not registered .You can send admin mail to a user who is already registered.`})
+
+        if(storedUser.isAdmin) return res.status(400).json({success:false , msg:`User with email id : ${email} is already an admin.`})
+
+        // token to provide in the mail
+        const tokenData = { email }
+
+        // sign a jwt token 
+        const jwtToken = jwt.sign(tokenData , process.env.JWT_ACCESS_TOKEN_SECRET)
+
+        await sendAdminRequestEmail(storedUser , jwtToken)
+
+        res.status(200).json({success:true , msg:`Admin request email has been sent to email id : ${email}`})
+
+    }
+    catch(error){
+        console.log(error)
+        res.status(500).json({success:false , msg:"Internal server error."})
+    }
+}
+
+const adminRequestAcceptance = async (req , res) => {
+    try {
+        const {token} = req.body
+        if(token == null) return res.status(400).json({success:false , msg:"Token is not provided."})
+
+        let tokenData ; 
+
+        try{
+            tokenData = verifyJWTToken(token)
+        }
+        catch(error){
+            return res.status(400).json({success:false , msg:"Provided token is invalid"})
+        }
+
+        const {email} = tokenData
+
+        const storedUser = await UserCollection.findOne({email})
+
+        if(storedUser === null)return res.status(400).json({success:false , msg:`The user with email id : ${email} does not exist any more.`})
+
+        if(storedUser.isAdmin) return res.status(400).json({success:false , msg:`User with email id : ${email} is already an admin.`})
+
+        await UserCollection.findByIdAndUpdate(storedUser._id , {isAdmin:true})
+
+        return res.status(200).json({success:true , msg:`User with email id : ${email} has been successfully appointed as Admin.`})
+
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({success:false , msg:"Internal server error."})
+    }
+}
+
+
+module.exports = {registerUser , loginUser , testController , verifyOTP , sendAdminRequestMail , adminRequestAcceptance}

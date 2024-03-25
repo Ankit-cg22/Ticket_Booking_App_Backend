@@ -1,3 +1,5 @@
+const jwt = require('jsonwebtoken')
+
 let ticketId = 1010;
 let eventId = 2020;
 
@@ -16,5 +18,14 @@ const generateOTP = () => {
     return OTP;
 }
 
+const verifyJWTToken = (jwtToken) => {
+    try {
+        const decodedData = jwt.verify(jwtToken , process.env.JWT_ACCESS_TOKEN_SECRET)
+        return decodedData
+    } catch (error) {
+        throw Error('Invalid JWT token.')
+    }
+}
 
-module.exports = {getNextTicketId , generateOTP , getNextEventId}
+
+module.exports = {getNextTicketId , generateOTP , getNextEventId , verifyJWTToken}

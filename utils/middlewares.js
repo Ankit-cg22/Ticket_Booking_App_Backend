@@ -1,17 +1,18 @@
-const jwt = require('jsonwebtoken')
+const { verifyJWTToken } = require('./utilityFunctions')
 
 const authenticateJWTToken = (req, res , next) => {
     const jwtToken = req.body.jwtToken
-    if(jwtToken == null) return res.status(401).json({success:false , msg:"No JWT token found in the requst ."})
+    if(jwtToken == null) return res.status(401).json({success:false , msg:"No JWT token found in the request."})
     
-    jwt.verify(jwtToken , process.env.JWT_ACCESS_TOKEN_SECRET , (err, user)=>{
-        // token is not valid
-        if(err) return res.status(403).json({success:false , msg:"Invalid JWT token ."})
-
-        // token in valid 
+    try{
+        const user = verifyJWTToken(jwtToken)
         req.verifiedUser = user;
         next()
-    })
+    }
+    catch(err){
+        return res.status(403).json({success:false , msg:"Invalid JWT token."})
+    }
+
 }
 
 const verifyUserIsAdmin = (req , res , next) => {
