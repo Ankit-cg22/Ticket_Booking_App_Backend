@@ -34,9 +34,8 @@ const sendOTPVerificationEmail = (userId , email) => {
                 userId ,
                 otp : hashedOTP , 
                 createdAt : Date.now() , 
-                expiresAt : Date.now() + (60 * 60 * 1000) 
+                expiresAt : Date.now() + ( parseInt(process.env.OTP_VALIDITY_IN_MINUTES) * 60 * 1000 ) 
             })
-    
             await newOTPVerificationEntry.save()
     
             await sendEmail(mailData)

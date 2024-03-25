@@ -23,9 +23,15 @@ const verifyJWTToken = (jwtToken) => {
         const decodedData = jwt.verify(jwtToken , process.env.JWT_ACCESS_TOKEN_SECRET)
         return decodedData
     } catch (error) {
-        throw Error('Invalid JWT token.')
+        throw new Error("Invalid JWT token.")
     }
 }
 
+const signAuthJWTToken = (tokenData) => {
+    tokenData.tokenExpiresAt = Date.now() + (parseInt(process.env.JWT_TOKEN_VALIDITY_IN_MINUTES) *60 * 1000)
+    const jwtToken = jwt.sign(tokenData , process.env.JWT_ACCESS_TOKEN_SECRET)
+    return jwtToken
+}
 
-module.exports = {getNextTicketId , generateOTP , getNextEventId , verifyJWTToken}
+
+module.exports = {getNextTicketId , generateOTP , getNextEventId , verifyJWTToken , signAuthJWTToken}

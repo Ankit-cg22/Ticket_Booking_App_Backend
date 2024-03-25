@@ -4,7 +4,7 @@ require('dotenv').config()
 const UserCollection = require('../models/User.js')
 const { sendOTPVerificationEmail, sendAdminRequestEmail } = require('../utils/mailing_service.js')
 const UserOTPVerificationCollection = require('../models/UserOTPVerification.js')
-const { verifyJWTToken } = require('../utils/utilityFunctions.js')
+const { verifyJWTToken, signAuthJWTToken } = require('../utils/utilityFunctions.js')
 
 const registerUser = async (req , res)=>{
     const userData = req.body 
@@ -22,9 +22,6 @@ const registerUser = async (req , res)=>{
         const savedUser = await UserCollection.insertMany(userData)
         const newUser = {userId : savedUser[0]._id , name:savedUser[0].name , email:savedUser[0].email , isAdmin:savedUser[0].isAdmin , isVerified : savedUser[0].isVerified}
 
-        // // sign JWT
-        // const jwtToken= jwt.sign(newUser , process.env.JWT_ACCESS_TOKEN_SECRET)
-        
         await sendOTPVerificationEmail( newUser.userId , newUser.email);
 
         res.status(201).json({success:true , msg :`New user created. OTP verfication email has been sent to emailID : ${newUser.email}` , userData : newUser })
@@ -52,7 +49,7 @@ const loginUser = async(req , res) => {
             const verifiedUser = {userId : storedUser._id , name:storedUser.name , email:storedUser.email , isAdmin:storedUser.isAdmin , isVerified : storedUser.isVerified}
 
             // sign the JWT
-            const jwtToken = jwt.sign(verifiedUser , process.env.JWT_ACCESS_TOKEN_SECRET)
+            const jwtToken = signAuthJWTToken(verifiedUser)
 
             res.status(200).json({success:true, msg:"User logged in." , userData : verifiedUser , jwtToken})
         }
@@ -62,6 +59,7 @@ const loginUser = async(req , res) => {
         }
 
     } catch (error) {
+        console.log(error)
         res.status(500).json({success:false , msg:"Internal server error."})
     }
 
@@ -105,11 +103,11 @@ const verifyOTP = async (req ,res)=>{
             name : updatedUser.name ,
             email : updatedUser.email ,
             isAdmin : updatedUser.isAdmin , 
-            isVerified : updatedUser.isVerified 
+            isVerified : updatedUser.isVerified
         }
 
         // sign the JWT
-        const jwtToken = jwt.sign(userData , process.env.JWT_ACCESS_TOKEN_SECRET)
+        const jwtToken = signAuthJWTToken(userData)
 
         res.status(200).json({success:true, msg:"User has been successfully verified." , userData , jwtToken})
 
@@ -154,12 +152,7 @@ const adminRequestAcceptance = async (req , res) => {
 
         let tokenData ; 
 
-        try{
-            tokenData = verifyJWTToken(token)
-        }
-        catch(error){
-            return res.status(400).json({success:false , msg:"Provided token is invalid"})
-        }
+        tokenData = verifyJWTToken(token)
 
         const {email} = tokenData
 

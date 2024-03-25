@@ -5,8 +5,13 @@ const authenticateJWTToken = (req, res , next) => {
     if(jwtToken == null) return res.status(401).json({success:false , msg:"No JWT token found in the request."})
     
     try{
-        const user = verifyJWTToken(jwtToken)
-        req.verifiedUser = user;
+        const tokenData = verifyJWTToken(jwtToken)
+        
+        if((tokenData.tokenExpiresAt) && (tokenData.tokenExpiresAt < Date.now())){
+            return res.status(400).json({success:false , msg:"Expired JWT token."})
+        }
+        delete tokenData.tokenExpiresAt
+        req.verifiedUser = tokenData;
         next()
     }
     catch(err){
