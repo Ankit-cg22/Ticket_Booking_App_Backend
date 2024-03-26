@@ -28,7 +28,7 @@ const verifyJWTToken = (jwtToken) => {
 }
 
 const signAuthJWTToken = (tokenData) => {
-    tokenData.tokenExpiresAt = Date.now() + (parseInt(process.env.JWT_TOKEN_VALIDITY_IN_MINUTES) *60 * 1000)
+    tokenData.tokenExpiresAt = Date.now() + (parseInt(process.env.JWT_TOKEN_VALIDITY_IN_HOURS) * 60 *60 * 1000)
     const jwtToken = jwt.sign(tokenData , process.env.JWT_ACCESS_TOKEN_SECRET)
     return jwtToken
 }

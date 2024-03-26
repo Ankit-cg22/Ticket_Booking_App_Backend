@@ -65,11 +65,6 @@ const loginUser = async(req , res) => {
 
 }
 
-const testController = (req ,res) =>{
-    const verifiedUser = req.verifiedUser
-    res.status(200).json({verifiedUser})
-}
-
 const verifyOTP = async (req ,res)=>{
     try{
         const userId = req.body.userId
@@ -174,4 +169,4 @@ const adminRequestAcceptance = async (req , res) => {
 }
 
 
-module.exports = {registerUser , loginUser , testController , verifyOTP , sendAdminRequestMail , adminRequestAcceptance}
+module.exports = {registerUser , loginUser  , verifyOTP , sendAdminRequestMail , adminRequestAcceptance}
