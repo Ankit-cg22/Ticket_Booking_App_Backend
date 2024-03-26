@@ -67,6 +67,9 @@ const markCheckedIn = async (req , res) =>{
         console.log(fetchData)
         if(fetchData.success === false) return res.status(404).json({success:false , msg : "Ticket Id does not exist"})
         const ticketData = fetchData.data.ticketData
+
+        if(ticketData.checkedIn === "1") return res.status(400).json({success:false , msg:"Ticket has already been checked in ."})
+
         ticketData.checkedIn = 1 
 
         const insertData = await insert_into_db(ticketId , ticketData)

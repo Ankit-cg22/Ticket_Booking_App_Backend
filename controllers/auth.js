@@ -146,9 +146,13 @@ const adminRequestAcceptance = async (req , res) => {
         if(token == null) return res.status(400).json({success:false , msg:"Token is not provided."})
 
         let tokenData ; 
-
-        tokenData = verifyJWTToken(token)
-
+        try{
+            tokenData = verifyJWTToken(token)
+        }
+        catch(error){
+            return res.status(400).json({success:false , msg:"Invalid JWT token"})
+        }
+        
         const {email} = tokenData
 
         const storedUser = await UserCollection.findOne({email})
