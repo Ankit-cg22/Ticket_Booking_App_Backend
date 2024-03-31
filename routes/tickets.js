@@ -4,12 +4,12 @@ const { authenticateJWTToken, verifyUserIsAdmin } = require('../utils/middleware
 const router = express.Router();
 
 // get info of ticket
-router.get('/getTicketInfo/:ticketId' ,authenticateJWTToken , getTicketInfo);
+router.post('/getTicketInfo/:ticketId' ,authenticateJWTToken , getTicketInfo);
 
 // book a ticket 
 router.post('/bookTicket', authenticateJWTToken , bookTicket);
 
 // mark a ticket as checkedIn
-router.get('/markCheckedIn/:ticketId' , authenticateJWTToken , verifyUserIsAdmin , markCheckedIn);
+router.post('/markCheckedIn/:ticketId' , authenticateJWTToken , verifyUserIsAdmin , markCheckedIn);
 
 module.exports = router 
