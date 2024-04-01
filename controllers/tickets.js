@@ -1,6 +1,7 @@
 const { getNextTicketId } = require("../utils/utilityFunctions")
 const { insert_into_db, fetch_from_db } = require("../utils/DB_Operations")
 const EventCollection = require('../models/Event.js')
+const TicketListCollection = require("../models/TicketList.js")
 require('dotenv').config()
 
 const getTicketInfo = async (req, res) => {
@@ -33,6 +34,9 @@ const bookTicket = async (req, res) => {
         checkedIn : 0 
     }
 
+    const user = req.verifiedUser 
+    console.log("validated")
+    console.log(user)
     try{
         const storedEvent = await EventCollection.findOne({eventId : ticketData.eventId})
 
@@ -48,6 +52,13 @@ const bookTicket = async (req, res) => {
 
         // update the ticket count of the event 
         const ticketCountUpdateData = await EventCollection.updateOne({eventId : ticketData.eventId} , {ticketsBooked : storedEvent.ticketsBooked + 1})
+
+        // add this ticketId to the ticket list of user
+        const ticketListUpdateData = await TicketListCollection.findOneAndUpdate(
+            { userId: user.userId },
+            { $addToSet: { ticketList : ticketId } } , 
+            { upsert: true, new: true }
+        )
 
         res.status(200).json({success:true , msg:"Ticket booked successfully." , data : {ticketData : insertData.data.ticketData}})
 
@@ -83,5 +94,32 @@ const markCheckedIn = async (req , res) =>{
 
 }
 
+const getAllTicketsOfUser = async (req , res) => {
+    try{
+        const userId = req.params.userId ;
+        const verifiedUser = req.verifiedUser 
+        
+        // user can only access his own tickets
+        if(verifiedUser.userId !== userId)return res.status(401).json({success:false , msg:"You are not authorized to access this information."})
 
-module.exports = {getTicketInfo , bookTicket , markCheckedIn}
+        const storedInfo = await TicketListCollection.findOne({userId})
+
+        const ticketIdList = storedInfo.ticketList
+
+        const ticketList = []
+
+        for(const ticketId of ticketIdList){
+            const data = await fetch_from_db(ticketId)
+            ticketList.push(data.data.ticketData)
+        }
+
+        return res.status(200).json({success:true , data:ticketList})
+
+    }
+    catch(error){
+        console.log(error)
+        res.status(500).json({success:false , msg:"Internal server error."})
+    }
+}
+
+module.exports = {getTicketInfo , bookTicket , markCheckedIn , getAllTicketsOfUser}
