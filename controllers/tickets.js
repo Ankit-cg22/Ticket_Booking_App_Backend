@@ -104,6 +104,9 @@ const getAllTicketsOfUser = async (req , res) => {
 
         const storedInfo = await TicketListCollection.findOne({userId})
 
+        // user has no booked tickets yet
+        if(storedInfo===null)return res.status(200).json({success:true , data:[]})
+
         const ticketIdList = storedInfo.ticketList
 
         const ticketList = []
