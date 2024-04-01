@@ -113,7 +113,8 @@ const getAllTicketsOfUser = async (req , res) => {
 
         for(const ticketId of ticketIdList){
             const data = await fetch_from_db(ticketId)
-            ticketList.push(data.data.ticketData)
+            const ticket = data.data.ticketData
+            if(ticket !== null)ticketList.push(ticket)
         }
 
         return res.status(200).json({success:true , data:ticketList})
