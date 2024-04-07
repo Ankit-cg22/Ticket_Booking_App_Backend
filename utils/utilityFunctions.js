@@ -1,16 +1,31 @@
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const EventsCollection = require('../models/Event');
+const TicketIdsCollection = require('../models/TicketIds')
 
-let ticketId = 1010;
-let eventId = 2020;
-
-function getNextTicketId(){
-    ++ticketId;
-    return ticketId;
+async function getNextTicketId(){
+    try{
+        const data = await TicketIdsCollection.find().sort({"ticketId" : -1}).limit(1)
+        let ticketId;
+        if(data.length === 0) ticketId = 1011;
+        else ticketId = data[0].ticketId + 1;
+        await TicketIdsCollection.insertMany({ticketId})
+        return ticketId;
+    }
+    catch(err){
+        throw new Error('Unable to generate ticket Id.')
+    }
 }
 
-function getNextEventId(){
-    ++eventId;
-    return eventId ;
+async function getNextEventId(){
+    try{
+        const data = await EventsCollection.find().sort({"eventId" : -1}).limit(1)
+        if(data.length === 0)return 2021;
+        const eventId = data[0].eventId + 1 ;
+        return eventId;
+    }
+    catch(err){
+        throw new Error('Unable to generate event Id .')
+    }
 }
 
 const generateOTP = () => {

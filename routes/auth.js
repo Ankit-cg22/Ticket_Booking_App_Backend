@@ -3,11 +3,11 @@ const { registerUser, loginUser, verifyOTP, sendAdminRequestMail, adminRequestAc
 const { authenticateJWTToken, verifyUserIsAdmin } = require('../utils/middlewares')
 const router = express.Router()
 
+// register
 router.post('/register' , registerUser)
-router.post('/login' , loginUser)
 
-// pass authenticateJWTToken method to other routes as a middleware
-// inside the controller , you can access the user using req.verifiedUser
+// login
+router.post('/login' , loginUser)
 
 // verify OTP 
 router.post('/verifyOTP' , verifyOTP)

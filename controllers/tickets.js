@@ -9,7 +9,6 @@ const getTicketInfo = async (req, res) => {
     
     fetch_from_db(ticketId)
     .then((data)=>{
-        console.log(data)
         const status = data.success
 
         // ticketId does not exist 
@@ -18,26 +17,26 @@ const getTicketInfo = async (req, res) => {
         //ticketId exists
         res.status(200).json({success:true , data : {ticketData: data.data.ticketData} })
     })
-    .catch((err)=>{
-        console.log(err)
+    .catch((error)=>{
+        console.log(error)
         res.status(500).json({success:false , msg:"Internal server error"})
 
     })
 }
 
 const bookTicket = async (req, res) => {
-    const ticketData = req.body.ticketData 
-    const ticketId = getNextTicketId()
-    const data = {
-        ticketId ,
-        ...ticketData ,
-        checkedIn : 0 
-    }
-
-    const user = req.verifiedUser 
-    console.log("validated")
-    console.log(user)
+    
     try{
+        const ticketData = req.body.ticketData 
+        const ticketId = await getNextTicketId()
+        const data = {
+            ticketId ,
+            ...ticketData ,
+            checkedIn : 0 
+        }
+
+        const user = req.verifiedUser 
+
         const storedEvent = await EventCollection.findOne({eventId : ticketData.eventId})
 
         // event does not exist
@@ -48,7 +47,6 @@ const bookTicket = async (req, res) => {
 
         // insert the ticket info into the Harmonia DB
         const insertData = await insert_into_db(ticketId , data)
-        console.log(insertData)
 
         // update the ticket count of the event 
         const ticketCountUpdateData = await EventCollection.updateOne({eventId : ticketData.eventId} , {ticketsBooked : storedEvent.ticketsBooked + 1})
@@ -75,7 +73,6 @@ const markCheckedIn = async (req , res) =>{
 
     try{
         const fetchData = await fetch_from_db(ticketId)
-        console.log(fetchData)
         if(fetchData.success === false) return res.status(404).json({success:false , msg : "Ticket Id does not exist"})
         const ticketData = fetchData.data.ticketData
 
@@ -84,11 +81,10 @@ const markCheckedIn = async (req , res) =>{
         ticketData.checkedIn = 1 
 
         const insertData = await insert_into_db(ticketId , ticketData)
-        console.log(insertData)
         res.status(200).json({success:true , msg:`Ticket with ticketId=${ticketId} has been marked as 'Checked In' .` , data:{ticketData}})
     }
-    catch(err){
-        console.log(err)
+    catch(error){
+        console.log(error)
         res.status(500).json({success:false , msg:"Internal server error"})
     }
 
@@ -114,7 +110,7 @@ const getAllTicketsOfUser = async (req , res) => {
         for(const ticketId of ticketIdList){
             const data = await fetch_from_db(ticketId)
             const ticket = data.data.ticketData
-            if(ticket !== null)ticketList.push(ticket)
+            if(ticket && ticket.ticketId)ticketList.push(ticket)
         }
 
         return res.status(200).json({success:true , data:ticketList})

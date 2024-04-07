@@ -1,7 +1,8 @@
 const { verifyJWTToken } = require('./utilityFunctions')
 
 const authenticateJWTToken = (req, res , next) => {
-    const jwtToken = req.body.jwtToken
+    const authHeader = req.headers['authorization']
+    const jwtToken = authHeader && authHeader.split(' ')[1]
     if(jwtToken == null) return res.status(401).json({success:false , msg:"No JWT token found in the request."})
     
     try{

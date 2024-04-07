@@ -4,10 +4,10 @@ const {getAllFutureEvents,getEventInfo, createEvent, updateEvent, deleteEvent } 
 const { authenticateJWTToken, verifyUserIsAdmin } = require('../utils/middlewares.js')
 
 // returns all events with eventDate >= currentDate
-router.post('/getAllFutureEvents', authenticateJWTToken ,getAllFutureEvents) 
+router.get('/getAllFutureEvents', authenticateJWTToken ,getAllFutureEvents) 
 
 // get info of a particular event
-router.post('/getEventInfo/:eventId' , authenticateJWTToken , getEventInfo)
+router.get('/getEventInfo/:eventId' , authenticateJWTToken , getEventInfo)
 
 // create an event
 router.post('/createEvent' , authenticateJWTToken , verifyUserIsAdmin , createEvent)
@@ -16,6 +16,6 @@ router.post('/createEvent' , authenticateJWTToken , verifyUserIsAdmin , createEv
 router.post('/updateEvent/:eventId' , authenticateJWTToken , verifyUserIsAdmin , updateEvent)
 
 //delete event
-router.post('/deleteEvent/:eventId' , authenticateJWTToken , verifyUserIsAdmin , deleteEvent)
+router.delete('/deleteEvent/:eventId' , authenticateJWTToken , verifyUserIsAdmin , deleteEvent)
 
 module.exports = router

@@ -38,7 +38,7 @@ const createEvent = async(req, res) => {
             return res.status(400).json({success:false , msg : "Please provide all of the following details : eventName , eventDate , totalTickets"})
         }
 
-        eventData.eventId = getNextEventId()
+        eventData.eventId = await getNextEventId()
 
         const savedEvent = await EventCollection.insertMany(eventData)
 
