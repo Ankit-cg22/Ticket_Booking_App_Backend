@@ -1,4 +1,4 @@
-const { haromia_db_insert, harmonia_db_search } = require("./Harmonia_DB_Operations")
+const { harmonia_db_search, harmonia_db_update, harmonia_db_insert,} = require("./Harmonia_DB_Operations")
 const { RSA_encrypt, RSA_decrypt } = require("./RSA")
 const { ObjtoString, StringToObj } = require("./parsing")
 
@@ -13,7 +13,7 @@ function insert_into_db(ticketId , ticketData){
             value : encryptedData
         }
 
-        haromia_db_insert(db_server_data)
+        harmonia_db_insert(db_server_data)
         .then((data)=>{
             resolve({succes: true , data:{ ticketData  , timeTakenInMicroSeconds : data.data.timeTakenInMicroSeconds }})
         })
@@ -22,7 +22,26 @@ function insert_into_db(ticketId , ticketData){
         })
     })
 }
+function update_in_db(ticketId , ticketData){
+    return new Promise((resolve , reject)=>{
+        const str = ObjtoString(ticketData)
 
+        const encryptedData = RSA_encrypt(str)
+
+        const db_server_data = {
+            key : ticketId ,
+            value : encryptedData
+        }
+
+        harmonia_db_update(db_server_data)
+        .then((data)=>{
+            resolve({succes: true , data:{ ticketData  , timeTakenInMicroSeconds : data.data.timeTakenInMicroSeconds }})
+        })
+        .catch((err)=>{
+            reject(err)
+        })
+    })
+}
 function fetch_from_db(ticketId){
     return new Promise((resolve , reject)=>{
         harmonia_db_search(ticketId)
@@ -48,4 +67,4 @@ function fetch_from_db(ticketId){
     })
 }
 
-module.exports = {insert_into_db,fetch_from_db}
+module.exports = {insert_into_db,fetch_from_db, update_in_db}

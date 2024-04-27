@@ -1,5 +1,5 @@
 const { getNextTicketId } = require("../utils/utilityFunctions")
-const { insert_into_db, fetch_from_db } = require("../utils/DB_Operations")
+const { insert_into_db, fetch_from_db, update_in_db } = require("../utils/DB_Operations")
 const EventCollection = require('../models/Event.js')
 const TicketListCollection = require("../models/TicketList.js")
 require('dotenv').config()
@@ -80,7 +80,7 @@ const markCheckedIn = async (req , res) =>{
 
         ticketData.checkedIn = 1 
 
-        const insertData = await insert_into_db(ticketId , ticketData)
+        const updateData = await update_in_db(ticketId , ticketData)
         res.status(200).json({success:true , msg:`Ticket with ticketId=${ticketId} has been marked as 'Checked In' .` , data:{ticketData}})
     }
     catch(error){
