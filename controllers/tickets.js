@@ -4,6 +4,7 @@ const EventCollection = require('../models/Event.js')
 const TicketListCollection = require("../models/TicketList.js")
 require('dotenv').config()
 
+//Get Information regarding ticket based on ticket Id
 const getTicketInfo = async (req, res) => {
     const ticketId = req.params.ticketId
     
@@ -23,7 +24,7 @@ const getTicketInfo = async (req, res) => {
 
     })
 }
-
+//Book Ticket for particular
 const bookTicket = async (req, res) => {
     
     try{
@@ -69,17 +70,19 @@ const bookTicket = async (req, res) => {
 }
 
 const markCheckedIn = async (req , res) =>{
+    // Extract ticketId from request parameters
     const ticketId = req.params.ticketId 
 
     try{
+        // Fetch ticket data from the database
         const fetchData = await fetch_from_db(ticketId)
         if(fetchData.success === false) return res.status(404).json({success:false , msg : "Ticket Id does not exist"})
         const ticketData = fetchData.data.ticketData
-
+        // If ticket is already checked in, return 400 Bad Request
         if(ticketData.checkedIn === "1") return res.status(400).json({success:false , msg:"Ticket has already been checked in ."})
-
+        // Mark ticket as checked in
         ticketData.checkedIn = 1 
-
+        // Update ticket data in the database
         const updateData = await update_in_db(ticketId , ticketData)
         res.status(200).json({success:true , msg:`Ticket with ticketId=${ticketId} has been marked as 'Checked In' .` , data:{ticketData}})
     }
@@ -106,7 +109,7 @@ const getAllTicketsOfUser = async (req , res) => {
         const ticketIdList = storedInfo.ticketList
 
         const ticketList = []
-
+       // Iterate through each ticketId in ticketIdList and fetch ticket data and add to ticket List
         for(const ticketId of ticketIdList){
             const data = await fetch_from_db(ticketId)
             const ticket = data.data.ticketData

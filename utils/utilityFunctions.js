@@ -27,6 +27,17 @@ async function getNextEventId(){
         throw new Error('Unable to generate event Id .')
     }
 }
+async function getCurrEventId(){
+    try{
+        const data = await EventsCollection.find().sort({"eventId" : -1}).limit(1)
+        if(data.length === 0)return 2021;
+        const eventId = data[0].eventId ;
+        return eventId;
+    }
+    catch(err){
+        throw new Error('Unable to generate event Id .')
+    }
+}
 
 const generateOTP = () => {
     const OTP = `${Math.floor(1000 + Math.random()*9000)}`

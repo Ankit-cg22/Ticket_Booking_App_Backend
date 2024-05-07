@@ -147,6 +147,7 @@ const adminRequestAcceptance = async (req , res) => {
 
         let tokenData ; 
         try{
+            // Verify JWT token
             tokenData = verifyJWTToken(token)
         }
         catch(error){
@@ -154,13 +155,13 @@ const adminRequestAcceptance = async (req , res) => {
         }
         
         const {email} = tokenData
-
+          // Find user based on email
         const storedUser = await UserCollection.findOne({email})
 
         if(storedUser === null)return res.status(400).json({success:false , msg:`The user with email id : ${email} does not exist any more.`})
-
+   
         if(storedUser.isAdmin) return res.status(400).json({success:false , msg:`User with email id : ${email} is already an admin.`})
-
+        // Update user to be an admin
         await UserCollection.findByIdAndUpdate(storedUser._id , {isAdmin:true})
 
         return res.status(200).json({success:true , msg:`User with email id : ${email} has been successfully appointed as Admin.`})

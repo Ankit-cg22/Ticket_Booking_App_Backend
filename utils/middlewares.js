@@ -1,5 +1,6 @@
 const { verifyJWTToken } = require('./utilityFunctions')
 
+//middleware to authenticate wt token
 const authenticateJWTToken = (req, res , next) => {
     const authHeader = req.headers['authorization']
     const jwtToken = authHeader && authHeader.split(' ')[1]
@@ -20,7 +21,7 @@ const authenticateJWTToken = (req, res , next) => {
     }
 
 }
-
+//middleware to verify if user is admin
 const verifyUserIsAdmin = (req , res , next) => {
     const verifiedUser = req.verifiedUser 
     if(verifiedUser.isAdmin === false)return res.status(401).json({success:false , msg:"You are not authorized to access this endpoint."})
